@@ -17,3 +17,7 @@
 ### setup your environment variable
 
 ```cp .env.example .env```
+
+### run the FastAPI server
+
+```uvicorn main:app --reload --host 0.0.0.0 --port 5000```
