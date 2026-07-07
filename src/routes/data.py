@@ -9,8 +9,9 @@ import logging
 from .schemas.data import ProcessRequest
 from models.ProjectModel import ProjectModel
 from models.ChunkModel import ChunkModel
-from models.db_schemas import DataChunk
-
+from models.AssetModel import AssetModel
+from models.db_schemas import DataChunk, Asset
+from models.enums.AssetTypeEnum import AssetTypeEnum
 
 logger = logging.getLogger('uvicorn.error')
 
@@ -49,15 +50,30 @@ async def upload_data(request: Request, project_id: str, file: UploadFile,
     except Exception as e:
         logger.error(f"Error while saving file: {e}")
         return JSONResponse(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            status_code=status.HTTP_400_BAD_REQUEST,
             content={"signal": ResponseSignal.FILE_UPLOAD_FAILED.value}
         )
+    
+    # Store asset into the database:
+
+    asset_model = await AssetModel.create_instance(
+        db_client=request.app.db_client
+    )
+
+    asset_resource = Asset(
+        asset_project_id = project.id,
+        asset_type = AssetTypeEnum.FILE.value,
+        asset_name = file_id,
+        asset_size=os.path.getsize(file_path)
+    )
+
+    asset_record = await asset_model.create_asset(asset=asset_resource)
     
     return JSONResponse(
         status_code=status.HTTP_200_OK,
         content={"signal": ResponseSignal.FILE_UPLOAD_SUCCESSFUL.value, 
                  "message": f"File '{file.filename}' uploaded successfully.",
-                 "file_id": file_id
+                 "file_id": str(asset_record.id)
                 }
     )
 

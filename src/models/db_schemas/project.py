@@ -25,7 +25,7 @@ class Project(BaseModel):
                     ("project_id", 1)
                 ],
                 "name":"project_id_index_1",
-                unique:True
+                "unique":True
             }
         ]
         
