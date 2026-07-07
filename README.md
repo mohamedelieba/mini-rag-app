@@ -16,8 +16,19 @@
 
 ### setup your environment variable
 
-```cp .env.example .env```
+```bash 
+$ cp .env.example .env
+```
+### Run docker compose to start mongodb
 
+```bash
+$ cd docker
+$ cp .env.example .env
+
+- update `.env` with your mongodb credentials
+
+$ docker compse up
+```
 ### run the FastAPI server
 
 ```uvicorn main:app --reload --host 0.0.0.0 --port 5000```
