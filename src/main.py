@@ -36,9 +36,10 @@ async def startup_span():
 
 async def shutdown_span():
     app.mongo_conn.close()
-    app.vectordb_client.disconnect()
-    
-app.router.lifespan.on_startup.append(startup_span)
+    if hasattr(app, "vectordb_client") and app.vectordb_client is not None:
+        app.vectordb_client.disconnect()
+
+app.router.lifespan.lifespan.on_startup.append(startup_span)
 app.router.lifespan.on_shutdown.append(shutdown_span)
 
 
