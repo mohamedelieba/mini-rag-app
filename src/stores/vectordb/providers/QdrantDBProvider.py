@@ -66,10 +66,11 @@ class QdrantDBProvider(VectorDBInterface):
             return False
         
         try:
-            _ = self.client.upload_records(
+            _ = self.client.upload_points(
                 collection_name=collection_name,
-                records=[
-                    models.Record(
+                points=[
+                    models.PointStruct(
+                        id=record_id,
                         vector=vector,
                         payload={
                             "text": text, "metadata": metadata
@@ -99,9 +100,11 @@ class QdrantDBProvider(VectorDBInterface):
             batch_texts = texts[i:batch_end]
             batch_vectors = vectors[i:batch_end]
             batch_metadata = metadata[i:batch_end]
+            batch_record_ids = record_ids[i:batch_end]
 
             batch_records = [
-                models.Record(
+                models.PointStruct(
+                    id=batch_record_ids[x],
                     vector=batch_vectors[x],
                     payload={
                         "text": batch_texts[x], "metadata": batch_metadata[x]
@@ -112,9 +115,9 @@ class QdrantDBProvider(VectorDBInterface):
             ]
 
             try:
-                _ = self.client.upload_records(
+                _ = self.client.upload_points(
                     collection_name=collection_name,
-                    records=batch_records,
+                    points=batch_records,
                 )
             except Exception as e:
                 self.logger.error(f"Error while inserting batch: {e}")
@@ -124,8 +127,8 @@ class QdrantDBProvider(VectorDBInterface):
         
     def search_by_vector(self, collection_name: str, vector: list, limit: int = 5):
 
-        return self.client.search(
+        return self.client.query_points(
             collection_name=collection_name,
-            query_vector=vector,
+            query=vector,
             limit=limit
-        )
+        ).points
