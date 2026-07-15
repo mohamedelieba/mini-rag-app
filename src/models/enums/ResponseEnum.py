@@ -16,3 +16,5 @@ class ResponseSignal(Enum):
     VECOTRDB_COLLECTION_RETREIVED="vectordb collection retreived"
     VECOTRDB_SEARCH_ERROR="error while searching in vectordb"
     VECOTRDB_SEARCH_SUCCESS="vectordb searched successfully"
+    RAG_ANSWER_SUCCESS="got a successfull rag answer"
+    RAG_ANSWER_ERROR="could not get a rag answer"
